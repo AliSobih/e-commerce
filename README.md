@@ -27,4 +27,14 @@
 ## ER-Diagrame:-
 ![image](https://github.com/AliSobih/e-commerce/assets/43109825/6761eff6-b5c4-42fa-9744-82cdce84bc3b)
 ## API Controllers:-
+## POST `/api/auth`
+### `/api/auth/register` -  Add a new user details.
+![image](https://github.com/AliSobih/e-commerce/assets/43109825/4fc6889d-46ae-45c1-8738-68041f8c60b4)
+### POST `/api/auth/authentication` - sign in.
+ - if the password or email is wrong then 403 forbidden response will return.
+      
+      - ![Screenshot 2024-01-24 095140](https://github.com/AliSobih/spring-boot-spring-security-jwt-authentication/assets/43109825/83707a5f-28eb-47a1-9bcb-9b850f3d60a3)
+    - if the email and password correct 200 ok will return and token.
+      
+   - ![Screenshot 2024-01-24 095155](https://github.com/AliSobih/spring-boot-spring-security-jwt-authentication/assets/43109825/3647ca46-739c-48de-8933-ad90763e3182)
 
