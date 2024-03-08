@@ -12,6 +12,7 @@ import java.util.List;
 @Table(name = "address")
 @Setter
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Address {

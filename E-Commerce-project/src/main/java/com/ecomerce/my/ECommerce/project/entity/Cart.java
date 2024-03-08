@@ -1,5 +1,6 @@
 package com.ecomerce.my.ECommerce.project.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +27,7 @@ public class Cart {
     private User user;
 
     @OneToMany(mappedBy = "cart", orphanRemoval = true)
+    @JsonIgnore
     private List<CartItem> cartItems =new ArrayList<>();
 
     @Column(name = "total_price")
