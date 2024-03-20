@@ -3,6 +3,7 @@ package com.ecomerce.my.ECommerce.project.Service;
 
 import com.ecomerce.my.ECommerce.project.dto.UserDTO;
 import com.ecomerce.my.ECommerce.project.dto.UserResponse;
+import com.ecomerce.my.ECommerce.project.entity.Cart;
 import com.ecomerce.my.ECommerce.project.entity.User;
 
 public interface UserService {
@@ -14,4 +15,7 @@ public interface UserService {
 	User updateUser(UserDTO userDTO);
 	
 	boolean deleteUser();
+
+	Cart getCart();
+	User findUser();
 }

@@ -59,7 +59,7 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinTable(name = "user_address", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "address_id"))
-    private List<Address> address = new ArrayList<>();
+    private List<Address> addresses = new ArrayList<>();
 
     @OneToOne(mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
@@ -85,9 +85,13 @@ public class User implements UserDetails {
         this.tokens.add(token);
     }
 
+    public void addAddress(Address address) {
+        this.addresses.add(address);
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(role.getName()));
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + role.getName()));
     }
 
     @Override

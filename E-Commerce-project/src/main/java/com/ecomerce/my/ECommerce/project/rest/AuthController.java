@@ -19,7 +19,6 @@ public class AuthController {
     private final AuthenticationServiceImp authenticationServiceImp;
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
-
         return new ResponseEntity<>(authenticationServiceImp.register(request), HttpStatus.OK);
     }
 

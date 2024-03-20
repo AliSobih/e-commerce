@@ -24,6 +24,7 @@ public class Cart {
 
     @OneToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "cart", orphanRemoval = true)
@@ -37,5 +38,8 @@ public class Cart {
     public void addItem(CartItem item) {
         item.setCart(this);
         cartItems.add(item);
+    }
+    public void addToTotalPrice(double price) {
+        totalPrice += price;
     }
 }

@@ -1,5 +1,6 @@
 package com.ecomerce.my.ECommerce.project.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -42,6 +43,7 @@ public class Address {
 	private String country;
 
 	@ManyToMany
+	@JsonIgnore
 	@JoinTable(name = "user_address", inverseJoinColumns = @JoinColumn(name = "user_id"), joinColumns = @JoinColumn(name = "address_id"))
 	private List<User> users = new ArrayList<>();
 

@@ -10,11 +10,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressDTO {
-
 	private Long addressId;
 	private String street;
 	private String buildingName;
 	private String city;
 	private String state;
 	private String country;
+
+	public AddressDTO(String country,
+					  String state,
+					  String city,
+					  String street,
+					  String buildingName) {
+		this.street = street;
+		this.buildingName = buildingName;
+		this.city = city;
+		this.state = state;
+		this.country = country;
+	}
 }

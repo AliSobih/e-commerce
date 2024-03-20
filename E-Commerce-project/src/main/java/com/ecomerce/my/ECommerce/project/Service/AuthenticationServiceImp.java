@@ -20,6 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImp implements AuthenticationService{
@@ -34,10 +36,14 @@ public class AuthenticationServiceImp implements AuthenticationService{
     @Transactional
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
-        Role role = roleRepo.findByName("user").orElseGet(() -> {
-            return new Role("user");
+        User user = userRepo.findByEmail(request.getEmail()).orElse(null);
+        if (user != null) {
+            return AuthenticationResponse.builder().token("").build();
+        }
+        Role role = roleRepo.findByName(request.getRole()).orElseGet(() -> {
+            return new Role(request.getRole());
         });
-        User user = User.builder()
+        user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
@@ -49,26 +55,32 @@ public class AuthenticationServiceImp implements AuthenticationService{
         Token token = new Token(jwtToken);
         tokenRepo.save(token);
         user.addToken(token);
+
+        if (Objects.equals(request.getRole(), "user")) {
+            Cart cart = new Cart();
+            cart.setUser(user);
+            cartRepo.save(cart);
+        }
         userRepo.save(user);
-        Cart cart = new Cart();
-        cart.setUser(user);
-        cartRepo.save(cart);
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
     @Override
     public AuthenticationResponse login(AuthenticationRequest request) {
+        User user = userRepo.findByEmail(request.getEmail()).orElseThrow();
 //        todo: if the email or password incorrect then exception will throws
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
-                        request.getPassword()
+                        request.getPassword(),
+                        user.getAuthorities()
                 )
         );
-        User user = userRepo.findByEmail(request.getEmail()).orElseThrow();
+
         String jwtToken = jwtService.generateToken(user);
         Token token = new Token(jwtToken);
         user.addToken(token);
+        tokenRepo.save(token);
         userRepo.save(user);
         return AuthenticationResponse.builder().token(jwtToken).build();
     }

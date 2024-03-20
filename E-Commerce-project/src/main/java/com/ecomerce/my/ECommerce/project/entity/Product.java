@@ -3,10 +3,7 @@ package com.ecomerce.my.ECommerce.project.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +43,7 @@ public class Product {
     private Category category;
 
     @OneToMany(mappedBy = "product")
-    private List<OrderItem> orderItems;
+    private List<OrderItem> orderItems = new ArrayList<>();
     public Product(String name, String description, String image, Integer quantity, double price, double discount) {
         this.name = name;
         this.description = description;
@@ -54,6 +51,16 @@ public class Product {
         this.quantity = quantity;
         this.price = price;
         this.discount = discount;
+    }
+
+    public Product(String name, String description, String image, Integer quantity, double price, double discount, Category category) {
+        this.name = name;
+        this.description = description;
+        this.image = image;
+        this.quantity = quantity;
+        this.price = price;
+        this.discount = discount;
+        this.category = category;
     }
 
     //    Convenience  method

@@ -2,6 +2,7 @@ package com.ecomerce.my.ECommerce.project.Service;
 
 import com.ecomerce.my.ECommerce.project.dto.UserDTO;
 import com.ecomerce.my.ECommerce.project.dto.UserResponse;
+import com.ecomerce.my.ECommerce.project.entity.Cart;
 import com.ecomerce.my.ECommerce.project.entity.User;
 import com.ecomerce.my.ECommerce.project.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,15 @@ public class UserServiceImp implements UserService{
         userRepo.delete(this.findUser());
         return true;
     }
-    private User findUser() {
+
+    @Override
+    public Cart getCart() {
+        User user = findUser();
+        return user.getCart();
+    }
+
+    @Override
+    public User findUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return this.getUserByEmail(email);
     }

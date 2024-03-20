@@ -4,10 +4,12 @@ import com.ecomerce.my.ECommerce.project.dto.AddressDTO;
 import com.ecomerce.my.ECommerce.project.entity.Address;
 import com.ecomerce.my.ECommerce.project.entity.User;
 import com.ecomerce.my.ECommerce.project.repository.AddressRepo;
+import com.ecomerce.my.ECommerce.project.repository.UserRepo;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,40 +17,44 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AddressServiceImp implements AddressServer{
     private final AddressRepo addressRepo;
+    private final UserRepo userRepo;
     private final UserService userService;
 
     @Override
+    @Transactional
     public boolean createAddress(AddressDTO addressDTO) {
         Address address = addressRepo.findByCountryAndStateAndCityAndStreetAndBuildingName(
-                addressDTO.getCountry(),
-                addressDTO.getState(),
-                addressDTO.getCity(),
-                addressDTO.getStreet(),
-                addressDTO.getBuildingName()
+                addressDTO.getCountry().toLowerCase(),
+                addressDTO.getState().toLowerCase(),
+                addressDTO.getCity().toLowerCase(),
+                addressDTO.getStreet().toLowerCase(),
+                addressDTO.getBuildingName().toLowerCase()
         ).orElse(null);
         if (address != null) {
             throw new RuntimeException("Address already exists!!!! ");
         }
         try {
             address = Address.builder()
-                    .street(addressDTO.getStreet())
-                    .buildingName(addressDTO.getBuildingName())
-                    .city(addressDTO.getCity())
-                    .state(addressDTO.getState())
-                    .country(addressDTO.getCountry())
+                    .street(addressDTO.getStreet().toLowerCase())
+                    .buildingName(addressDTO.getBuildingName().toLowerCase())
+                    .city(addressDTO.getCity().toLowerCase())
+                    .state(addressDTO.getState().toLowerCase())
+                    .country(addressDTO.getCountry().toLowerCase())
                     .build();
         }catch (Exception e) {
             return false;
         }
         addressRepo.save(address);
+        User user = userService.getUser();
+        user.addAddress(address);
+        userRepo.save(user);
         return true;
     }
 
     @Override
     public List<Address> getAllAddresses() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.getUserByEmail(email);
-        return user.getAddress();
+        User user = userService.getUser();
+        return user.getAddresses();
     }
 
     @Override
@@ -61,7 +67,7 @@ public class AddressServiceImp implements AddressServer{
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.getUserByEmail(email);
         Address address = addressRepo.findById(addressDTO.getAddressId()).orElse(null);
-        if (user.getAddress().contains(address)) {
+        if (user.getAddresses().contains(address)) {
             if (addressDTO.getCity() != null) {
                 address.setCity(addressDTO.getCity());
             }
@@ -88,7 +94,7 @@ public class AddressServiceImp implements AddressServer{
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.getUserByEmail(email);
         Address address = addressRepo.findById(id).orElse(null);
-        if (user.getAddress().contains(address)) {
+        if (user.getAddresses().contains(address)) {
             addressRepo.delete(address);
             return true;
         }
