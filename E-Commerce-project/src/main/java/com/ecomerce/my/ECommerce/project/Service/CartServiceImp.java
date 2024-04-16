@@ -1,9 +1,15 @@
 package com.ecomerce.my.ECommerce.project.Service;
 
 import com.ecomerce.my.ECommerce.project.dto.CartItemDTO;
+import com.ecomerce.my.ECommerce.project.entity.Cart;
 import com.ecomerce.my.ECommerce.project.entity.CartItem;
 import com.ecomerce.my.ECommerce.project.entity.Product;
 import com.ecomerce.my.ECommerce.project.entity.User;
+import com.ecomerce.my.ECommerce.project.patterns.CartItemFactory.CartItemFactory;
+import com.ecomerce.my.ECommerce.project.patterns.StrategyDesignPattern.DiscountContext;
+import com.ecomerce.my.ECommerce.project.patterns.StrategyDesignPattern.DiscountStrategy;
+import com.ecomerce.my.ECommerce.project.patterns.StrategyDesignPattern.NoDiscountStrategy;
+import com.ecomerce.my.ECommerce.project.patterns.StrategyDesignPattern.PercentageDiscountStrategy;
 import com.ecomerce.my.ECommerce.project.repository.CartItemRepo;
 import com.ecomerce.my.ECommerce.project.repository.CartRepo;
 import com.ecomerce.my.ECommerce.project.repository.ProductRepo;
@@ -24,23 +30,29 @@ public class CartServiceImp implements CartService {
     @Transactional
     public CartItem addProduct(CartItemDTO item) {
         Product product = productService.getProductById(item.getId());
-        if (product == null || item.getQuantity() <= 0) {
+        if (product == null || item.getQuantity() <= 0 || product.getQuantity() < item.getQuantity()) {
             return null;
         }
-        if (product.getQuantity() < item.getQuantity()) {
-            return null;
-        }
-        CartItem cartItem = new CartItem();
+
         User user = userService.findUser();
-        cartItem.setCart(user.getCart());
-        cartItem.setQuantity(item.getQuantity());
-        cartItem.setDiscount(product.getDiscount());
+
+        DiscountStrategy discountStrategy = null;
+        if (product.getPrice() * item.getQuantity() > 1000) {
+            discountStrategy = new PercentageDiscountStrategy();
+        }else {
+            discountStrategy = new NoDiscountStrategy();
+        }
+
+        Cart cart = user.getCart();
+        DiscountContext discountContext = new DiscountContext(discountStrategy);
+
+        cart.addToTotalPrice((product.getPrice() - discountContext.calculateDiscount(product)) * item.getQuantity());
+
+        CartItem cartItem = CartItemFactory.createCartItem(product, item.getQuantity(), product.getDiscount());
         cartItemRepo.save(cartItem);
-        product.addCartItem(cartItem);
-        productRepo.save(product);
-//        System.out.println((product.getPrice() - product.getDiscount()) * item.getQuantity());
-        user.getCart().addToTotalPrice((product.getPrice() - product.getDiscount()) * item.getQuantity());
-        cartRepo.save(user.getCart());
+        cart.addItem(cartItem);
+
+        cartRepo.save(cart);
         return cartItem;
     }
 
@@ -50,7 +62,14 @@ public class CartServiceImp implements CartService {
     }
 
     @Override
-    public CartItem updateProduct(long id) {
-        return null;
+    public CartItem updateCartItem(CartItemDTO cartItemDTO) {
+//        userService.findUser()
+        CartItem cartItem = cartItemRepo.findById(cartItemDTO.getId()).orElse(null);
+        if (cartItem == null || cartItemDTO.getQuantity() <= 0) {
+            return null;
+        }
+        cartItem.setQuantity(cartItemDTO.getQuantity());
+        cartItemRepo.save(cartItem);
+        return cartItem;
     }
 }

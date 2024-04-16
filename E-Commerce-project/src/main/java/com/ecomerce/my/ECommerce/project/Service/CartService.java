@@ -6,5 +6,5 @@ import com.ecomerce.my.ECommerce.project.entity.CartItem;
 public interface CartService {
     CartItem addProduct(CartItemDTO cart);
     boolean deleteProduct(Long id);
-    CartItem updateProduct(long id);
+    CartItem updateCartItem(CartItemDTO cartItemDTO);
 }

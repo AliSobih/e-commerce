@@ -20,4 +20,11 @@ public class CartRest {
         CartItem item = cartService.addProduct(cartItemDTO);
         return item != null ? new ResponseEntity<>(HttpStatus.CREATED): new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+    @PostMapping("/update-item")
+    public ResponseEntity<CartItem> updateCartItem(@RequestBody CartItemDTO cartItemDTO) {
+        CartItem cartItem = cartService.updateCartItem(cartItemDTO);
+        return cartItem == null ?
+                new ResponseEntity<>(HttpStatus.BAD_REQUEST) :
+                new ResponseEntity<>(cartItem, HttpStatus.OK);
+    }
 }
